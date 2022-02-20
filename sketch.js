@@ -3,7 +3,7 @@ let border = 50;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
-    let b = new boid(width/2, height/2, random(-5,5), random(-5,5))
+    let b = new boid(random(width), random(height), random(-5,5), random(-5,5))
     boids.push(b);
   }
 }
@@ -12,7 +12,7 @@ function setup() {
   createCanvas(windowWidth,windowHeight);
   stroke(255);
   strokeWeight(10);
-  instantiateBoids(20, boid)
+  instantiateBoids(50, boid)
 }
 
 function draw() {
@@ -35,6 +35,21 @@ function boisCohesion(_boid, boidArr=[]) {
       boidsInProximity.push(boidArr[i]);
     }
   }
+  //find avg pos of boidsInProximity
+  let targetpoint = createVector();
+  for(let i = 0; i < boidsInProximity.length; i++) {
+    targetpoint.add(boidsInProximity[i].x,boidsInProximity[i].y);
+  }
+  targetpoint.div(boidsInProximity.length);
+  stroke(0,0,255);
+  strokeWeight(2);
+  line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
+  strokeWeight(10);
+  stroke(255);
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /10}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /10}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /10}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /10}
 }
 
 function updateBoid(_boid) {
