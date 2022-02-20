@@ -22,7 +22,13 @@ function draw() {
     updateBoid(boids[i]);
     boisBorder(boids[i]);
     boisCohesion(boids[i], boids);
+    boidMaxSpeed(boids[i]);
   }
+}
+
+function boidMaxSpeed(_boid) {
+  if(_boid.dx > 5) {_boid.dx = 5;}
+  if(_boid.dy > 5) {_boid.dy = 5;}
 }
 
 function boisCohesion(_boid, boidArr=[]) {
@@ -51,10 +57,10 @@ function boisCohesion(_boid, boidArr=[]) {
   line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
   strokeWeight(10);
   stroke(255);
-  if(_boid.x < targetpoint.x) {_boid.dx += 1 /5}
-  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /5}
-  if(_boid.y < targetpoint.y) {_boid.dy += 1 /5}
-  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /5}
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /8}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /8}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /8}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /8}
 }
 
 function updateBoid(_boid) {
