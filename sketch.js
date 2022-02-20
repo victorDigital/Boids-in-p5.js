@@ -18,21 +18,52 @@ function setup() {
 function draw() {
   background(13);
   for(let i = 0 ; i < boids.length ; i++) {
-    point(boids[i].x,boids[i].y);
+    boidDraw(boids[i]);
     updateBoid(boids[i]);
     boidBorder(boids[i]);
     boidCohesion(boids[i], boids);
+    boidAlignment(boids[i], boids);
+    boidSepration(boids[i], boids)
     boidMaxSpeed(boids[i]);
   }
 }
 
-function boidAlignment(_boid, boidArr=[]) {
+function boidSepration(_boid, boidArr=[]) {
+  let seprationRange = 60;
+  let boidsInProximity = [];
 
+  for(let i = 0; i < boidArr.length;  i++) {
+    if(dist(_boid.x, _boid.y, boidArr[i].x, boidArr[i].y) < seprationRange) {
+      if(_boid.x != boidArr[i].x || _boid.y != boidArr[i].y) {
+        boidsInProximity.push(boidArr[i]);
+      }
+    }
+  }
+  let closestBoid = createVector();
+  for(let i = 0; i < boidsInProximity.length; i++) {
+    closestBoid.add(boidsInProximity[i].x,boidsInProximity[i].y);
+  }
+  closestBoid.div(boidsInProximity.length);
+  if(closestBoid.x != 0) {
+    strokeWeight(3);
+    stroke(255,0,0)
+    line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
+    stroke(255)
+    strokeWeight(10);
+    if(_boid.x < closestBoid.x) {_boid.dx -= 1 /20}
+    if(_boid.x > closestBoid.x) {_boid.dx += 1 /20}
+    if(_boid.y < closestBoid.y) {_boid.dy -= 1 /20}
+    if(_boid.y > closestBoid.y) {_boid.dy += 1 /20}
+  }
+}
+
+function boidAlignment(_boid, boidArr=[]) {
+  
 }
 
 function boidMaxSpeed(_boid) {
-  if(_boid.dx > 5) {_boid.dx = 5;}
-  if(_boid.dy > 5) {_boid.dy = 5;}
+  if(_boid.dx > 3) {_boid.dx = 3;}
+  if(_boid.dy > 3) {_boid.dy = 3;}
 }
 
 function boidCohesion(_boid, boidArr=[]) {
@@ -43,11 +74,6 @@ function boidCohesion(_boid, boidArr=[]) {
   for(let i = 0; i < boidArr.length;  i++) {
     if(dist(_boid.x, _boid.y, boidArr[i].x, boidArr[i].y) < cohesionRange) {
       boidsInProximity.push(boidArr[i]);
-      stroke(0,0,255,100);
-      strokeWeight(2);
-      line(_boid.x,_boid.y,boidArr[i].x,boidArr[i].y);
-      strokeWeight(10);
-      stroke(255);
     }
   }
   //find avg pos of boidsInProximity
@@ -56,15 +82,15 @@ function boidCohesion(_boid, boidArr=[]) {
     targetpoint.add(boidsInProximity[i].x,boidsInProximity[i].y);
   }
   targetpoint.div(boidsInProximity.length);
-  stroke(0,0,255);
+  stroke(0,0,255,75);
   strokeWeight(2);
   line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
   strokeWeight(10);
   stroke(255);
-  if(_boid.x < targetpoint.x) {_boid.dx += 1 /8}
-  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /8}
-  if(_boid.y < targetpoint.y) {_boid.dy += 1 /8}
-  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /8}
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /20}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /20}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /20}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /20}
 }
 
 function updateBoid(_boid) {
@@ -95,6 +121,13 @@ function boidBorder(_boid) {
   if(_boid.y >= height - border) {
     _boid.dy--;
   }
+}
+
+function boidDraw(_boid) {
+  point(_boid.x,_boid.y);
+  strokeWeight(2);
+  line(_boid.x,_boid.y,_boid.x+_boid.dx*4,_boid.y+_boid.dy*4)
+  strokeWeight(10);
 }
 
 class boid {
