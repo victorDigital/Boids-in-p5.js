@@ -33,6 +33,11 @@ function boisCohesion(_boid, boidArr=[]) {
   for(let i = 0; i < boidArr.length;  i++) {
     if(dist(_boid.x, _boid.y, boidArr[i].x, boidArr[i].y) < cohesionRange) {
       boidsInProximity.push(boidArr[i]);
+      stroke(0,0,255,100);
+      strokeWeight(2);
+      line(_boid.x,_boid.y,boidArr[i].x,boidArr[i].y);
+      strokeWeight(10);
+      stroke(255);
     }
   }
   //find avg pos of boidsInProximity
@@ -46,10 +51,10 @@ function boisCohesion(_boid, boidArr=[]) {
   line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
   strokeWeight(10);
   stroke(255);
-  if(_boid.x < targetpoint.x) {_boid.dx += 1 /10}
-  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /10}
-  if(_boid.y < targetpoint.y) {_boid.dy += 1 /10}
-  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /10}
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /5}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /5}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /5}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /5}
 }
 
 function updateBoid(_boid) {
