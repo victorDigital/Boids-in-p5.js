@@ -20,10 +20,14 @@ function draw() {
   for(let i = 0 ; i < boids.length ; i++) {
     point(boids[i].x,boids[i].y);
     updateBoid(boids[i]);
-    boisBorder(boids[i]);
-    boisCohesion(boids[i], boids);
+    boidBorder(boids[i]);
+    boidCohesion(boids[i], boids);
     boidMaxSpeed(boids[i]);
   }
+}
+
+function boidAlignment(_boid, boidArr=[]) {
+
 }
 
 function boidMaxSpeed(_boid) {
@@ -31,7 +35,7 @@ function boidMaxSpeed(_boid) {
   if(_boid.dy > 5) {_boid.dy = 5;}
 }
 
-function boisCohesion(_boid, boidArr=[]) {
+function boidCohesion(_boid, boidArr=[]) {
   //find boids in close proximity!
   let cohesionRange = 100;
   let boidsInProximity = [];
@@ -68,7 +72,7 @@ function updateBoid(_boid) {
   _boid.y += _boid.dy;
 }
 
-function boisBorder(_boid) {
+function boidBorder(_boid) {
   stroke(255,0,0);
   noFill();
   rect(0,0,width,height);
