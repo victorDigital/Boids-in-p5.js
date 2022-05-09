@@ -19,12 +19,12 @@ function draw() {
   background(13);
   for(let i = 0 ; i < boids.length ; i++) {
     boidDraw(boids[i]);
+    boidMaxSpeed(boids[i]);
     updateBoid(boids[i]);
     boidBorder(boids[i]);
     boidCohesion(boids[i], boids);
     boidAlignment(boids[i], boids);
     boidSepration(boids[i], boids)
-    boidMaxSpeed(boids[i]);
   }
 }
 
@@ -50,25 +50,52 @@ function boidSepration(_boid, boidArr=[]) {
     line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
     stroke(255)
     strokeWeight(10);
-    if(_boid.x < closestBoid.x) {_boid.dx -= 1 /20}
-    if(_boid.x > closestBoid.x) {_boid.dx += 1 /20}
-    if(_boid.y < closestBoid.y) {_boid.dy -= 1 /20}
-    if(_boid.y > closestBoid.y) {_boid.dy += 1 /20}
+    if(_boid.x > closestBoid.x) {_boid.dx += 1 /10}
+    if(_boid.y < closestBoid.y) {_boid.dy -= 1 /10}
+    if(_boid.x < closestBoid.x) {_boid.dx -= 1 /10}
+    if(_boid.y > closestBoid.y) {_boid.dy += 1 /10}
   }
 }
 
 function boidAlignment(_boid, boidArr=[]) {
-  
+  let alignmentRange = 70;
+  let boidsInProximity = [];
+
+  for(let i = 0; i < boidArr.length;  i++) {
+    if(dist(_boid.x, _boid.y, boidArr[i].x, boidArr[i].y) < alignmentRange) {
+      boidsInProximity.push(boidArr[i]);
+    }
+  }
+
+  //steer in direction of the avg of the steering vectors of the boids in proximity
+  let steeringVector = createVector();
+  for(let i = 0; i < boidsInProximity.length; i++) {
+    steeringVector.add(boidsInProximity[i].dx,boidsInProximity[i].dy);
+  }
+  steeringVector.div(boidsInProximity.length);
+  if(_boid.x < steeringVector.x+_boid.x) {_boid.dx += 1 /30}
+  if(_boid.x > steeringVector.x+_boid.x) {_boid.dx -= 1 /30}
+  if(_boid.y < steeringVector.y+_boid.y) {_boid.dy += 1 /30}
+  if(_boid.y > steeringVector.y+_boid.y) {_boid.dy -= 1 /30}
+
+  stroke(255,255,0,75);
+  strokeWeight(2);
+  line(_boid.x,_boid.y,steeringVector.x+_boid.x,steeringVector.y+_boid.y);
+  line(_boid.x,_boid.y,boidsInProximity[0].x,boidsInProximity[0].y);
+  strokeWeight(10);
+  stroke(255);
 }
 
 function boidMaxSpeed(_boid) {
-  if(_boid.dx > 3) {_boid.dx = 3;}
-  if(_boid.dy > 3) {_boid.dy = 3;}
+  if(_boid.dx > 2) {_boid.dx = 2;}
+  if(_boid.dy > 2) {_boid.dy = 2;}
+  if(_boid.dx < -2) {_boid.dx = -2;}
+  if(_boid.dy < -2) {_boid.dy = -2;}
 }
 
 function boidCohesion(_boid, boidArr=[]) {
   //find boids in close proximity!
-  let cohesionRange = 100;
+  let cohesionRange = 110;
   let boidsInProximity = [];
 
   for(let i = 0; i < boidArr.length;  i++) {
@@ -94,8 +121,8 @@ function boidCohesion(_boid, boidArr=[]) {
 }
 
 function updateBoid(_boid) {
-  _boid.x += _boid.dx;
-  _boid.y += _boid.dy;
+  _boid.x += _boid.dx + random(-0.1,0.1);
+  _boid.y += _boid.dy + random(-0.1,0.1);
 }
 
 function boidBorder(_boid) {
