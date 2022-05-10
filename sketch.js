@@ -2,12 +2,12 @@ let boids = [];
 let border = 50;
 
 let prob1 = 10;
-let prob2 = 60;
+let prob2 = 30;
 let prob3 = 40;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
-    let b = new boid(random(width), random(height), random(-5,5), random(-5,5))
+    let b = new boid(random(width), random(height), random(-2,2), random(-2,2))
     boids.push(b);
   }
 }
@@ -51,7 +51,9 @@ function boidSepration(_boid, boidArr=[]) {
   if(closestBoid.x != 0) {
     strokeWeight(3);
     stroke(255,0,0,100)
-    line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
+    if(dist(mouseX, mouseY, _boid.x, _boid.y) < 200) {
+      line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
+    }
     stroke(255)
     strokeWeight(10);
     if(_boid.x > closestBoid.x) {_boid.dx += 1 /prob1}
@@ -84,8 +86,9 @@ function boidAlignment(_boid, boidArr=[]) {
 
   stroke(255,255,0,75);
   strokeWeight(2);
-  line(_boid.x,_boid.y,steeringVector.x+_boid.x,steeringVector.y+_boid.y);
-  line(_boid.x,_boid.y,boidsInProximity[0].x,boidsInProximity[0].y);
+  if(dist(mouseX, mouseY, _boid.x, _boid.y) < 200) {
+    line(_boid.x,_boid.y,boidsInProximity[0].x,boidsInProximity[0].y);
+  }
   strokeWeight(10);
   stroke(255);
 }
@@ -115,7 +118,9 @@ function boidCohesion(_boid, boidArr=[]) {
   targetpoint.div(boidsInProximity.length);
   stroke(0,0,255,75);
   strokeWeight(2);
-  line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
+  if(dist(mouseX, mouseY, _boid.x, _boid.y) < 200) {
+    line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
+  }
   strokeWeight(10);
   stroke(255);
   if(_boid.x < targetpoint.x) {_boid.dx += 1 /prob3}
@@ -125,8 +130,8 @@ function boidCohesion(_boid, boidArr=[]) {
 }
 
 function updateBoid(_boid) {
-  _boid.x += _boid.dx + random(-0.1,0.1);
-  _boid.y += _boid.dy + random(-0.1,0.1);
+  _boid.x += _boid.dx ;
+  _boid.y += _boid.dy ;
 }
 
 function boidBorder(_boid) {
@@ -141,16 +146,16 @@ function boidBorder(_boid) {
   strokeWeight(10);
 
   if(_boid.x <= border) {
-    _boid.dx++;
+    _boid.dx += 1 /5;
   }
   if(_boid.y <= border) {
-    _boid.dy++;
+    _boid.dy += 1 /5;
   }
   if(_boid.x >= width - border) {
-    _boid.dx--;
+    _boid.dx -= 1 /5;
   }
   if(_boid.y >= height - border) {
-    _boid.dy--;
+    _boid.dy -= 1 /5;
   }
 }
 
