@@ -1,6 +1,10 @@
 let boids = [];
 let border = 50;
 
+let prob1 = 10;
+let prob2 = 60;
+let prob3 = 40;
+
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
     let b = new boid(random(width), random(height), random(-5,5), random(-5,5))
@@ -46,14 +50,14 @@ function boidSepration(_boid, boidArr=[]) {
   closestBoid.div(boidsInProximity.length);
   if(closestBoid.x != 0) {
     strokeWeight(3);
-    stroke(255,0,0)
+    stroke(255,0,0,100)
     line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
     stroke(255)
     strokeWeight(10);
-    if(_boid.x > closestBoid.x) {_boid.dx += 1 /10}
-    if(_boid.y < closestBoid.y) {_boid.dy -= 1 /10}
-    if(_boid.x < closestBoid.x) {_boid.dx -= 1 /10}
-    if(_boid.y > closestBoid.y) {_boid.dy += 1 /10}
+    if(_boid.x > closestBoid.x) {_boid.dx += 1 /prob1}
+    if(_boid.y < closestBoid.y) {_boid.dy -= 1 /prob1}
+    if(_boid.x < closestBoid.x) {_boid.dx -= 1 /prob1}
+    if(_boid.y > closestBoid.y) {_boid.dy += 1 /prob1}
   }
 }
 
@@ -73,10 +77,10 @@ function boidAlignment(_boid, boidArr=[]) {
     steeringVector.add(boidsInProximity[i].dx,boidsInProximity[i].dy);
   }
   steeringVector.div(boidsInProximity.length);
-  if(_boid.x < steeringVector.x+_boid.x) {_boid.dx += 1 /30}
-  if(_boid.x > steeringVector.x+_boid.x) {_boid.dx -= 1 /30}
-  if(_boid.y < steeringVector.y+_boid.y) {_boid.dy += 1 /30}
-  if(_boid.y > steeringVector.y+_boid.y) {_boid.dy -= 1 /30}
+  if(_boid.x < steeringVector.x+_boid.x) {_boid.dx += 1 /prob2}
+  if(_boid.x > steeringVector.x+_boid.x) {_boid.dx -= 1 /prob2}
+  if(_boid.y < steeringVector.y+_boid.y) {_boid.dy += 1 /prob2}
+  if(_boid.y > steeringVector.y+_boid.y) {_boid.dy -= 1 /prob2}
 
   stroke(255,255,0,75);
   strokeWeight(2);
@@ -114,10 +118,10 @@ function boidCohesion(_boid, boidArr=[]) {
   line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
   strokeWeight(10);
   stroke(255);
-  if(_boid.x < targetpoint.x) {_boid.dx += 1 /20}
-  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /20}
-  if(_boid.y < targetpoint.y) {_boid.dy += 1 /20}
-  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /20}
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /prob3}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /prob3}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /prob3}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /prob3}
 }
 
 function updateBoid(_boid) {
