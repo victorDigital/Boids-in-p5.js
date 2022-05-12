@@ -1,4 +1,6 @@
 let boids = [];
+let sharks = [];
+
 let border = 50;
 
 let prob1 = 8;
@@ -7,8 +9,15 @@ let prob3 = 35;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
-    let b = new boid(random(width), random(height), random(-2,2), random(-2,2))
+    let b = new boid(random(width), random(height), random(-1,1), random(-1,1));
     boids.push(b);
+  }
+}
+
+function instantiateSharks(num, _shark) {
+  for(let i = 0 ; i < num ; i++) {
+    let s = new shark(random(width), random(height), random(-1,1), random(-1,1));
+    sharks.push(s);
   }
 }
 
@@ -17,6 +26,7 @@ function setup() {
   stroke(255);
   strokeWeight(10);
   instantiateBoids(5, boid)
+  instantiateSharks(10, shark)
 }
 
 function draw() {
@@ -34,6 +44,13 @@ function draw() {
     boidAlignment(boids[i], boids);
     boidSepration(boids[i], boids)
   }
+
+  for(let i = 0 ; i < sharks.length ; i++) {
+    sharkDraw(sharks[i]);
+    sharkMaxSpeed(sharks[i]);
+    updateShark(sharks[i]);
+    sharkBorder(sharks[i]);
+
 }
 
 function boidSepration(_boid, boidArr=[]) {
@@ -178,4 +195,58 @@ class boid {
     this.dx = dx;
     this.dy = dy;
   }
+}
+
+//make a shark that wants to eat the boids
+
+class shark {
+  constructor(x, y, dx, dy) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+  }
+}
+
+function sharkDraw(_shark) {
+  stroke(255,0,0);
+  noFill();
+  ellipse(_shark.x,_shark.y,20,20);
+}
+
+function updateshark(_shark) {
+  _shark.x += _shark.dx ;
+  _shark.y += _shark.dy ;
+}
+
+function sharkborder(_shark) {
+  stroke(255,0,0);
+  noFill();
+  rect(0,0,width,height);
+  strokeWeight(2);
+  stroke(0,255,0);
+  noFill();
+  rect(0+border,0+border,width -(border*2),height-(border*2));
+  stroke(255);
+  strokeWeight(10);
+
+  if(_shark.x <= border) {
+    _shark.dx += 1 /5;
+  }
+  if(_shark.y <= border) {
+    _shark.dy += 1 /5;
+  }
+  if(_shark.x >= width - border) {
+    _shark.dx -= 1 /5;
+  }
+  if(_shark.y >= height - border) {
+    _shark.dy -= 1 /5;
+  }
+}
+
+function sharkMaxSpeed(_shark) {
+  if(_shark.dx > 3) {_shark.dx = 3}
+  if(_shark.dy > 3) {_shark.dy = 3}
+  if(_shark.dx < -3) {_shark.dx = -3}
+  if(_shark.dy < -3) {_shark.dy = -3}
 }
