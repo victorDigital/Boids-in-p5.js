@@ -6,6 +6,8 @@ let border = 50;
 let prob1 = 8;
 let prob2 = 30;
 let prob3 = 35;
+let prob4 = 8;
+let prob5 = 3;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
@@ -25,8 +27,8 @@ function setup() {
   createCanvas(windowWidth,windowHeight);
   stroke(255);
   strokeWeight(10);
-  instantiateBoids(5, boid)
-  instantiateSharks(10, shark)
+  instantiateBoids(50, boid)
+  instantiateSharks(5, shark)
 }
 
 function draw() {
@@ -43,6 +45,7 @@ function draw() {
     boidCohesion(boids[i], boids);
     boidAlignment(boids[i], boids);
     boidSepration(boids[i], boids)
+    boidFlee(boids[i], sharks);
   }
 
   for(let i = 0 ; i < sharks.length ; i++) {
@@ -50,7 +53,8 @@ function draw() {
     sharkMaxSpeed(sharks[i]);
     updateShark(sharks[i]);
     sharkBorder(sharks[i]);
-
+    sharkAttack(sharks[i], boids);
+  }
 }
 
 function boidSepration(_boid, boidArr=[]) {
@@ -64,23 +68,23 @@ function boidSepration(_boid, boidArr=[]) {
       }
     }
   }
-  let closestBoid = createVector();
+  let targetpoint = createVector();
   for(let i = 0; i < boidsInProximity.length; i++) {
-    closestBoid.add(boidsInProximity[i].x,boidsInProximity[i].y);
+    targetpoint.add(boidsInProximity[i].x,boidsInProximity[i].y);
   }
-  closestBoid.div(boidsInProximity.length);
-  if(closestBoid.x != 0) {
+  targetpoint.div(boidsInProximity.length);
+  if(targetpoint.x != 0) {
     strokeWeight(3);
     stroke(255,0,0,100)
     if( boids.length < 40) {
-      line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
+      line(_boid.x,_boid.y,targetpoint.x,targetpoint.y)
     }
     stroke(255)
     strokeWeight(10);
-    if(_boid.x > closestBoid.x) {_boid.dx += 1 /prob1}
-    if(_boid.y < closestBoid.y) {_boid.dy -= 1 /prob1}
-    if(_boid.x < closestBoid.x) {_boid.dx -= 1 /prob1}
-    if(_boid.y > closestBoid.y) {_boid.dy += 1 /prob1}
+    if(_boid.x > targetpoint.x) {_boid.dx += 1 /prob1}
+    if(_boid.y < targetpoint.y) {_boid.dy -= 1 /prob1}
+    if(_boid.x < targetpoint.x) {_boid.dx -= 1 /prob1}
+    if(_boid.y > targetpoint.y) {_boid.dy += 1 /prob1}
   }
 }
 
@@ -151,6 +155,25 @@ function boidCohesion(_boid, boidArr=[]) {
   if(_boid.y > targetpoint.y) {_boid.dy -= 1 /prob3}
 }
 
+function boidFlee(_boid, sharks) {
+  let sharkRange = 70;
+  let sharksInProximity = [];
+  for(let i = 0 ; i < sharks.length ; i++) {
+    if(dist(_boid.x, _boid.y, sharks[i].x, sharks[i].y) < sharkRange) {
+      sharksInProximity.push(sharks[i]);
+    }
+  }
+  let targetpoint = createVector();
+  for(let i = 0; i < sharksInProximity.length; i++) {
+    targetpoint.add(sharksInProximity[i].x,sharksInProximity[i].y);
+  }
+  targetpoint.div(sharksInProximity.length);
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /prob5}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /prob5}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /prob5}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /prob5}
+}
+
 function updateBoid(_boid) {
   _boid.x += _boid.dx ;
   _boid.y += _boid.dy ;
@@ -211,15 +234,15 @@ class shark {
 function sharkDraw(_shark) {
   stroke(255,0,0);
   noFill();
-  ellipse(_shark.x,_shark.y,20,20);
+  ellipse(_shark.x,_shark.y,10,10);
 }
 
-function updateshark(_shark) {
+function updateShark(_shark) {
   _shark.x += _shark.dx ;
   _shark.y += _shark.dy ;
 }
 
-function sharkborder(_shark) {
+function sharkBorder(_shark) {
   stroke(255,0,0);
   noFill();
   rect(0,0,width,height);
@@ -249,4 +272,49 @@ function sharkMaxSpeed(_shark) {
   if(_shark.dy > 3) {_shark.dy = 3}
   if(_shark.dx < -3) {_shark.dx = -3}
   if(_shark.dy < -3) {_shark.dy = -3}
+}
+
+function sharkAttack(_shark, _boids) {
+  let sharkRange = 120;
+  let boidsInProximityToShark = [];
+  for(let i = 0; i < boids.length; i++) {
+    if(dist(_shark.x, _shark.y, boids[i].x, boids[i].y) < sharkRange) {
+      boidsInProximityToShark.push(boids[i]);
+    }
+  }
+  if(boidsInProximityToShark.length > 0) {
+    let targetpoint = createVector();
+    //find only the closest boid
+    for(let i = 0; i < boidsInProximityToShark.length; i++) {
+      if(dist(_shark.x, _shark.y, boidsInProximityToShark[i].x, boidsInProximityToShark[i].y) < dist(_shark.x, _shark.y, targetpoint.x, targetpoint.y)) {
+        targetpoint.set(boidsInProximityToShark[i].x,boidsInProximityToShark[i].y);
+      }
+    }
+    //if the shark is close to the boid, eat it
+    for(let i = 0; i < _boids.length; i++) {
+      if(dist(_shark.x, _shark.y, _boids[i].x, _boids[i].y) < 10) {
+        print("EAT:" + str(i))
+        boids.splice(i,1);
+      }
+    }
+
+
+    //move towards the closest boid
+    if(_shark.x < targetpoint.x) {_shark.dx += 1 /prob4}
+    if(_shark.x > targetpoint.x) {_shark.dx -= 1 /prob4}
+    if(_shark.y < targetpoint.y) {_shark.dy += 1 /prob4}
+    if(_shark.y > targetpoint.y) {_shark.dy -= 1 /prob4}
+
+    stroke(255,255,255);
+    strokeWeight(2);
+    line(_shark.x,_shark.y,targetpoint.x,targetpoint.y);
+    strokeWeight(10);
+    stroke(255);
+  }
+
+  //if no boids are in range, move randomly
+  if(boidsInProximityToShark.length == 0) {
+    _shark.dx += random(-0.3,0.3);
+    _shark.dy += random(-0.3,0.3);
+  }
 }
