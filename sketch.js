@@ -1,9 +1,9 @@
 let boids = [];
 let border = 50;
 
-let prob1 = 10;
+let prob1 = 8;
 let prob2 = 30;
-let prob3 = 40;
+let prob3 = 35;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
@@ -16,11 +16,15 @@ function setup() {
   createCanvas(windowWidth,windowHeight);
   stroke(255);
   strokeWeight(10);
-  instantiateBoids(50, boid)
+  instantiateBoids(5, boid)
 }
 
 function draw() {
   background(13);
+  if (mouseIsPressed === true) {
+    boids.push(new boid(mouseX, mouseY, random(-1,1), random(-1,1)));
+  }
+
   for(let i = 0 ; i < boids.length ; i++) {
     boidDraw(boids[i]);
     boidMaxSpeed(boids[i]);
@@ -51,7 +55,7 @@ function boidSepration(_boid, boidArr=[]) {
   if(closestBoid.x != 0) {
     strokeWeight(3);
     stroke(255,0,0,100)
-    if(dist(mouseX, mouseY, _boid.x, _boid.y) < 200) {
+    if( boids.length < 40) {
       line(_boid.x,_boid.y,closestBoid.x,closestBoid.y)
     }
     stroke(255)
@@ -64,7 +68,7 @@ function boidSepration(_boid, boidArr=[]) {
 }
 
 function boidAlignment(_boid, boidArr=[]) {
-  let alignmentRange = 70;
+  let alignmentRange = 120;
   let boidsInProximity = [];
 
   for(let i = 0; i < boidArr.length;  i++) {
@@ -77,6 +81,7 @@ function boidAlignment(_boid, boidArr=[]) {
   let steeringVector = createVector();
   for(let i = 0; i < boidsInProximity.length; i++) {
     steeringVector.add(boidsInProximity[i].dx,boidsInProximity[i].dy);
+    steeringVector.add(random(-1,1),random(-1,1));
   }
   steeringVector.div(boidsInProximity.length);
   if(_boid.x < steeringVector.x+_boid.x) {_boid.dx += 1 /prob2}
@@ -86,7 +91,7 @@ function boidAlignment(_boid, boidArr=[]) {
 
   stroke(255,255,0,75);
   strokeWeight(2);
-  if(dist(mouseX, mouseY, _boid.x, _boid.y) < 200) {
+  if( boids.length < 40) {
     line(_boid.x,_boid.y,boidsInProximity[0].x,boidsInProximity[0].y);
   }
   strokeWeight(10);
@@ -118,7 +123,7 @@ function boidCohesion(_boid, boidArr=[]) {
   targetpoint.div(boidsInProximity.length);
   stroke(0,0,255,75);
   strokeWeight(2);
-  if(dist(mouseX, mouseY, _boid.x, _boid.y) < 200) {
+  if( boids.length < 40) {
     line(_boid.x,_boid.y,targetpoint.x,targetpoint.y);
   }
   strokeWeight(10);
@@ -174,4 +179,3 @@ class boid {
     this.dy = dy;
   }
 }
-
