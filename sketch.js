@@ -29,12 +29,12 @@ function setup() {
   createCanvas(windowWidth,windowHeight);
   stroke(255);
   strokeWeight(10);
-  instantiateBoids(50, boid)
-  instantiateSharks(1, shark)
+  instantiateBoids(200 , boid)
+  instantiateSharks(2, shark)
 }
 
 function draw() {
-  background(13);
+  background(0);
   if (mouseIsPressed === true) {
     boids.push(new boid(mouseX, mouseY, random(-1,1), random(-1,1)));
   }
