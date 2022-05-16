@@ -1,7 +1,7 @@
-let boids = [];
-let sharks = [];
+let boids = []; // contains array of boids objects
+let sharks = []; // contains array of shark objects
 
-let border = 50;
+let border = 30;
 let showDebug = false;
 
 let prob1 = 5;
