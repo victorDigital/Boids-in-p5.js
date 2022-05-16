@@ -30,7 +30,7 @@ function setup() {
   stroke(255);
   strokeWeight(10);
   instantiateBoids(50, boid)
-  instantiateSharks(10, shark)
+  instantiateSharks(1, shark)
 }
 
 function draw() {
@@ -38,7 +38,7 @@ function draw() {
   if (mouseIsPressed === true) {
     boids.push(new boid(mouseX, mouseY, random(-1,1), random(-1,1)));
   }
-
+  limitAmountOfBoids(boids);
   for(let i = 0 ; i < boids.length ; i++) {
     boidDraw(boids[i]);
     boidMaxSpeed(boids[i]);
@@ -396,5 +396,12 @@ function sharkSepration(_shark) {
       stroke(255);
       strokeWeight(10);
     }
+  }
+}
+
+function limitAmountOfBoids(_boids) {
+  if(_boids.length > 150) {
+    _boids.splice(0,1);
+    print("boid removed");
   }
 }
