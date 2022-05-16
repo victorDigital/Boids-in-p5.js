@@ -2,13 +2,14 @@ let boids = [];
 let sharks = [];
 
 let border = 50;
+let showDebug = false;
 
 let prob1 = 5;
 let prob2 = 30;
 let prob3 = 35;
 let prob4 = 8;
-let prob5 = 8;
-let prob6 = 10;
+let prob5 = 4;
+let prob6 = 5;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
@@ -29,7 +30,7 @@ function setup() {
   stroke(255);
   strokeWeight(10);
   instantiateBoids(50, boid)
-  instantiateSharks(15, shark)
+  instantiateSharks(10, shark)
 }
 
 function draw() {
@@ -81,6 +82,17 @@ function boidSepration(_boid, boidArr=[]) {
     if(_boid.x < targetpoint.x) {_boid.dx -= 1 /prob1}
     if(_boid.y > targetpoint.y) {_boid.dy += 1 /prob1}
   }
+
+  if(showDebug) {
+    if(boidsInProximity.length > 0) {
+      stroke(255,0,0);
+      strokeWeight(2);
+      line(_boid.x, _boid.y, targetpoint.x, targetpoint.y);
+      strokeWeight(10);
+      stroke(255);
+    }
+    
+  }
 }
 
 function boidAlignment(_boid, boidArr=[]) {
@@ -93,24 +105,39 @@ function boidAlignment(_boid, boidArr=[]) {
     }
   }
 
-  //steer in direction of the avg of the steering vectors of the boids in proximity
   let steeringVector = createVector();
   for(let i = 0; i < boidsInProximity.length; i++) {
     steeringVector.add(boidsInProximity[i].dx,boidsInProximity[i].dy);
     steeringVector.add(random(-1,1),random(-1,1));
   }
   steeringVector.div(boidsInProximity.length);
-  if(_boid.x < steeringVector.x+_boid.x) {_boid.dx += 1 /prob2}
-  if(_boid.x > steeringVector.x+_boid.x) {_boid.dx -= 1 /prob2}
-  if(_boid.y < steeringVector.y+_boid.y) {_boid.dy += 1 /prob2}
-  if(_boid.y > steeringVector.y+_boid.y) {_boid.dy -= 1 /prob2}
+  let boidVector = createVector(_boid.x, _boid.y);
+  let newBoidVetor = createVector(_boid.x+steeringVector.x, _boid.y+steeringVector.y);
+  boidVector.sub(newBoidVetor);
+  let newBoidAngle = boidVector.heading();
+  let newdirection = createVector(cos(newBoidAngle),sin(newBoidAngle));
+  newdirection.normalize();
+  newdirection.mult(1/prob4);
+  _boid.dx -= newdirection.x;
+  _boid.dy -= newdirection.y;
+
+  if(showDebug) {
+    stroke(255,255,0);
+    strokeWeight(2);
+    line(_boid.x, _boid.y, steeringVector.x+_boid.x, steeringVector.y+_boid.y);
+    strokeWeight(10);
+    stroke(255);
+  }
 }
 
 function boidMaxSpeed(_boid) {
-  if(_boid.dx > 2) {_boid.dx = 2;}
-  if(_boid.dy > 2) {_boid.dy = 2;}
-  if(_boid.dx < -2) {_boid.dx = -2;}
-  if(_boid.dy < -2) {_boid.dy = -2;}
+  let speedVector = createVector(_boid.dx, _boid.dy);
+  if(speedVector.mag() > 2) {
+    speedVector.normalize();
+    speedVector.mult(2);
+    _boid.dx = speedVector.x;
+    _boid.dy = speedVector.y;
+  }
 }
 
 function boidCohesion(_boid, boidArr=[]) {
@@ -133,6 +160,15 @@ function boidCohesion(_boid, boidArr=[]) {
   if(_boid.x > targetpoint.x) {_boid.dx -= 1 /prob3}
   if(_boid.y < targetpoint.y) {_boid.dy += 1 /prob3}
   if(_boid.y > targetpoint.y) {_boid.dy -= 1 /prob3}
+
+  //draw a line between the boid and the targetpoint
+  if(showDebug) {
+    stroke(0,0,255);
+    strokeWeight(2);
+    line(_boid.x, _boid.y, targetpoint.x, targetpoint.y);
+    strokeWeight(10);
+    stroke(255);
+  }
 }
 
 function boidFlee(_boid, sharks) {
@@ -153,6 +189,13 @@ function boidFlee(_boid, sharks) {
     if(_boid.x > targetpoint.x) {_boid.dx += 1 /prob5}
     if(_boid.y < targetpoint.y) {_boid.dy -= 1 /prob5}
     if(_boid.y > targetpoint.y) {_boid.dy += 1 /prob5}
+    if(showDebug) {
+      stroke(0,255,0);
+      strokeWeight(2);
+      line(_boid.x, _boid.y, targetpoint.x, targetpoint.y);
+      strokeWeight(10);
+      stroke(255);
+    }
   }
 }
 
@@ -162,15 +205,17 @@ function updateBoid(_boid) {
 }
 
 function boidBorder(_boid) {
-  stroke(255,0,0);
-  noFill();
-  rect(0,0,width,height);
-  strokeWeight(2);
-  stroke(0,255,0);
-  noFill();
-  rect(0+border,0+border,width -(border*2),height-(border*2));
-  stroke(255);
-  strokeWeight(10);
+  if(showDebug) {
+    stroke(255,0,0);
+    noFill();
+    rect(0,0,width,height);
+    strokeWeight(2);
+    stroke(0,255,0);
+    noFill();
+    rect(0+border,0+border,width -(border*2),height-(border*2));
+    stroke(255);
+    strokeWeight(10);
+  }
 
   if(_boid.x <= border) {
     _boid.dx += 1 /2;
@@ -230,15 +275,17 @@ function updateShark(_shark) {
 }
 
 function sharkBorder(_shark) {
-  stroke(255,0,0);
-  noFill();
-  rect(0,0,width,height);
-  strokeWeight(2);
-  stroke(0,255,0);
-  noFill();
-  rect(0+border,0+border,width -(border*2),height-(border*2));
-  stroke(255);
-  strokeWeight(10);
+  if(showDebug) {
+    stroke(255,0,0);
+    noFill();
+    rect(0,0,width,height);
+    strokeWeight(2);
+    stroke(0,255,0);
+    noFill();
+    rect(0+border,0+border,width -(border*2),height-(border*2));
+    stroke(255);
+    strokeWeight(10);
+  }
 
   if(_shark.x <= border) {
     _shark.dx += 1 /5;
@@ -255,10 +302,13 @@ function sharkBorder(_shark) {
 }
 
 function sharkMaxSpeed(_shark) {
-  if(_shark.dx > 2.2) {_shark.dx = 2.2}
-  if(_shark.dy > 2.2) {_shark.dy = 2.2}
-  if(_shark.dx < -2.2) {_shark.dx = -2.2}
-  if(_shark.dy < -2.2) {_shark.dy = -2.2}
+  let speedVector = createVector(_shark.dx, _shark.dy);
+  if(speedVector.mag() > 3) {
+    speedVector.normalize();
+    speedVector.mult(3);
+    _shark.dx = speedVector.x;
+    _shark.dy = speedVector.y;
+  }
 }
 
 function sharkAttack(_shark, _boids) {
@@ -287,18 +337,22 @@ function sharkAttack(_shark, _boids) {
       }
     }
 
-
-    //move towards the closest boid
-    if(_shark.x < targetpoint.x + (targetpointSpeed.x*10)) {_shark.dx += 1 /prob4}
-    if(_shark.x > targetpoint.x + (targetpointSpeed.x*10)) {_shark.dx -= 1 /prob4}
-    if(_shark.y < targetpoint.y + (targetpointSpeed.y*10)) {_shark.dy += 1 /prob4}
-    if(_shark.y > targetpoint.y + (targetpointSpeed.y*10)) {_shark.dy -= 1 /prob4}
-
-    stroke(255,0,0);
-    strokeWeight(2);
-    line(_shark.x,_shark.y,targetpoint.x + (targetpointSpeed.x*10),targetpoint.y + (targetpointSpeed.y*10));
-    strokeWeight(10);
-    stroke(255);
+    let sharkpoint = createVector(_shark.x,_shark.y);
+    sharkpoint.sub(targetpoint);
+    let angleToboid = sharkpoint.heading();
+    let newdirection = createVector(cos(angleToboid),sin(angleToboid));
+    newdirection.normalize();
+    newdirection.mult(1/prob4);
+    _shark.dx -= newdirection.x;
+    _shark.dy -= newdirection.y;
+    if(showDebug) {
+      stroke(255,0,0,100);
+      strokeWeight(2);
+      line(_shark.x,_shark.y,targetpoint.x + (targetpointSpeed.x*10),targetpoint.y + (targetpointSpeed.y*10));
+      line(_shark.x,_shark.y,targetpoint.x,targetpoint.y);
+      strokeWeight(10);
+      stroke(255);
+    }
   }
 
   //if no boids are in range, move randomly
@@ -316,7 +370,7 @@ function sharkSepration(_shark) {
       sharksInProximityToShark.push(sharks[i]);
     }
   }
-  if(sharksInProximityToShark.length > 0) {
+  if(sharksInProximityToShark.length != 0) {
     let targetpoint = createVector();
     //find only the avgerage of all the sharks in proximity
     for(let i = 0; i < sharksInProximityToShark.length; i++) {
@@ -324,9 +378,23 @@ function sharkSepration(_shark) {
     }
     targetpoint.div(sharksInProximityToShark.length);
     //move away from the average of the sharks in proximity
-    if(_shark.x < targetpoint.x) {_shark.dx -= 1 / prob6}
-    if(_shark.x > targetpoint.x) {_shark.dx += 1 / prob6}
-    if(_shark.y < targetpoint.y) {_shark.dy -= 1 / prob6}
-    if(_shark.y > targetpoint.y) {_shark.dy += 1 / prob6}
+    let sharkpoint = createVector(_shark.x,_shark.y);
+    sharkpoint.sub(targetpoint);
+    let angleToboid = sharkpoint.heading();
+    let newdirection = createVector(cos(angleToboid),sin(angleToboid));
+    newdirection.normalize();
+    newdirection.mult(1/prob6);
+    if(newdirection.y == 0) {
+      return
+    }
+    _shark.dx += newdirection.x;
+    _shark.dy += newdirection.y;
+    if(showDebug) {
+      stroke(255,255,0,100);
+      strokeWeight(2);
+      line(_shark.x,_shark.y,_shark.x+newdirection.x*200,_shark.y+newdirection.y*200);
+      stroke(255);
+      strokeWeight(10);
+    }
   }
 }
