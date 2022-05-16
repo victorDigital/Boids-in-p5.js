@@ -29,7 +29,7 @@ function setup() {
   createCanvas(windowWidth,windowHeight);
   stroke(255);
   strokeWeight(10);
-  instantiateBoids(200 , boid)
+  instantiateBoids(150 , boid)
   instantiateSharks(2, shark)
 }
 
