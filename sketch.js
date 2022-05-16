@@ -6,7 +6,7 @@ let border = 50;
 let prob1 = 5;
 let prob2 = 30;
 let prob3 = 35;
-let prob4 = 20;
+let prob4 = 8;
 let prob5 = 8;
 let prob6 = 10;
 
@@ -271,10 +271,12 @@ function sharkAttack(_shark, _boids) {
   }
   if(boidsInProximityToShark.length > 0) {
     let targetpoint = createVector();
+    let targetpointSpeed = createVector();
     //find only the closest boid
     for(let i = 0; i < boidsInProximityToShark.length; i++) {
       if(dist(_shark.x, _shark.y, boidsInProximityToShark[i].x, boidsInProximityToShark[i].y) < dist(_shark.x, _shark.y, targetpoint.x, targetpoint.y)) {
         targetpoint.set(boidsInProximityToShark[i].x,boidsInProximityToShark[i].y);
+        targetpointSpeed.set(boidsInProximityToShark[i].dx,boidsInProximityToShark[i].dy);
       }
     }
     //if the shark is close to the boid, eat it
@@ -287,14 +289,14 @@ function sharkAttack(_shark, _boids) {
 
 
     //move towards the closest boid
-    if(_shark.x < targetpoint.x) {_shark.dx += 1 /prob4}
-    if(_shark.x > targetpoint.x) {_shark.dx -= 1 /prob4}
-    if(_shark.y < targetpoint.y) {_shark.dy += 1 /prob4}
-    if(_shark.y > targetpoint.y) {_shark.dy -= 1 /prob4}
+    if(_shark.x < targetpoint.x + (targetpointSpeed.x*10)) {_shark.dx += 1 /prob4}
+    if(_shark.x > targetpoint.x + (targetpointSpeed.x*10)) {_shark.dx -= 1 /prob4}
+    if(_shark.y < targetpoint.y + (targetpointSpeed.y*10)) {_shark.dy += 1 /prob4}
+    if(_shark.y > targetpoint.y + (targetpointSpeed.y*10)) {_shark.dy -= 1 /prob4}
 
     stroke(255,0,0);
     strokeWeight(2);
-    line(_shark.x,_shark.y,targetpoint.x,targetpoint.y);
+    line(_shark.x,_shark.y,targetpoint.x + (targetpointSpeed.x*10),targetpoint.y + (targetpointSpeed.y*10));
     strokeWeight(10);
     stroke(255);
   }
