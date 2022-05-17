@@ -4,12 +4,12 @@ let sharks = []; // contains array of shark objects
 let border = 30;
 let showDebug = false;
 
-let prob1 = 5;
-let prob2 = 30;
-let prob3 = 35;
-let prob4 = 8;
-let prob5 = 4;
-let prob6 = 5;
+let boidSeprationFactor = 5;
+let boidAlignmentFactor = 8;
+let boidCohesionFactor = 35;
+let sharkAttackFactor = 8;
+let boidFleeFactor = 4;
+let sharkSeprationFactor = 5;
 
 function instantiateBoids(num, _boid) {
   for(let i = 0 ; i < num ; i++) {
@@ -77,10 +77,14 @@ function boidSepration(_boid, boidArr=[]) {
   }
   targetpoint.div(boidsInProximity.length);
   if(targetpoint.x != 0) {
-    if(_boid.x > targetpoint.x) {_boid.dx += 1 /prob1}
-    if(_boid.y < targetpoint.y) {_boid.dy -= 1 /prob1}
-    if(_boid.x < targetpoint.x) {_boid.dx -= 1 /prob1}
-    if(_boid.y > targetpoint.y) {_boid.dy += 1 /prob1}
+    let boidpoint = createVector(_boid.x,_boid.y);
+    boidpoint.sub(targetpoint);
+    let angleToboid = boidpoint.heading();
+    let newdirection = createVector(cos(angleToboid),sin(angleToboid));
+    newdirection.normalize();
+    newdirection.mult(1/boidSeprationFactor);
+    _boid.dx += newdirection.x;
+    _boid.dy += newdirection.y;
   }
 
   if(showDebug) {
@@ -117,7 +121,7 @@ function boidAlignment(_boid, boidArr=[]) {
   let newBoidAngle = boidVector.heading();
   let newdirection = createVector(cos(newBoidAngle),sin(newBoidAngle));
   newdirection.normalize();
-  newdirection.mult(1/prob4);
+  newdirection.mult(1/boidAlignmentFactor);
   _boid.dx -= newdirection.x;
   _boid.dy -= newdirection.y;
 
@@ -156,10 +160,10 @@ function boidCohesion(_boid, boidArr=[]) {
     targetpoint.add(boidsInProximity[i].x,boidsInProximity[i].y);
   }
   targetpoint.div(boidsInProximity.length);
-  if(_boid.x < targetpoint.x) {_boid.dx += 1 /prob3}
-  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /prob3}
-  if(_boid.y < targetpoint.y) {_boid.dy += 1 /prob3}
-  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /prob3}
+  if(_boid.x < targetpoint.x) {_boid.dx += 1 /boidCohesionFactor}
+  if(_boid.x > targetpoint.x) {_boid.dx -= 1 /boidCohesionFactor}
+  if(_boid.y < targetpoint.y) {_boid.dy += 1 /boidCohesionFactor}
+  if(_boid.y > targetpoint.y) {_boid.dy -= 1 /boidCohesionFactor}
 
   //draw a line between the boid and the targetpoint
   if(showDebug) {
@@ -172,7 +176,7 @@ function boidCohesion(_boid, boidArr=[]) {
 }
 
 function boidFlee(_boid, sharks) {
-  let sharkRange = 70;
+  let sharkRange = 150;
   let sharksInProximity = [];
   for(let i = 0 ; i < sharks.length ; i++) {
     if(dist(_boid.x, _boid.y, sharks[i].x, sharks[i].y) < sharkRange) {
@@ -185,10 +189,10 @@ function boidFlee(_boid, sharks) {
       targetpoint.add(sharksInProximity[i].x,sharksInProximity[i].y);
     }
     targetpoint.div(sharksInProximity.length);
-    if(_boid.x < targetpoint.x) {_boid.dx -= 1 /prob5}
-    if(_boid.x > targetpoint.x) {_boid.dx += 1 /prob5}
-    if(_boid.y < targetpoint.y) {_boid.dy -= 1 /prob5}
-    if(_boid.y > targetpoint.y) {_boid.dy += 1 /prob5}
+    if(_boid.x < targetpoint.x) {_boid.dx -= 1 /boidFleeFactor}
+    if(_boid.x > targetpoint.x) {_boid.dx += 1 /boidFleeFactor}
+    if(_boid.y < targetpoint.y) {_boid.dy -= 1 /boidFleeFactor}
+    if(_boid.y > targetpoint.y) {_boid.dy += 1 /boidFleeFactor}
     if(showDebug) {
       stroke(0,255,0);
       strokeWeight(2);
@@ -342,7 +346,7 @@ function sharkAttack(_shark, _boids) {
     let angleToboid = sharkpoint.heading();
     let newdirection = createVector(cos(angleToboid),sin(angleToboid));
     newdirection.normalize();
-    newdirection.mult(1/prob4);
+    newdirection.mult(1/sharkAttackFactor);
     _shark.dx -= newdirection.x;
     _shark.dy -= newdirection.y;
     if(showDebug) {
@@ -383,7 +387,7 @@ function sharkSepration(_shark) {
     let angleToboid = sharkpoint.heading();
     let newdirection = createVector(cos(angleToboid),sin(angleToboid));
     newdirection.normalize();
-    newdirection.mult(1/prob6);
+    newdirection.mult(1/sharkSeprationFactor);
     if(newdirection.y == 0) {
       return
     }
