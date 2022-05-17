@@ -189,10 +189,15 @@ function boidFlee(_boid, sharks) {
       targetpoint.add(sharksInProximity[i].x,sharksInProximity[i].y);
     }
     targetpoint.div(sharksInProximity.length);
-    if(_boid.x < targetpoint.x) {_boid.dx -= 1 /boidFleeFactor}
-    if(_boid.x > targetpoint.x) {_boid.dx += 1 /boidFleeFactor}
-    if(_boid.y < targetpoint.y) {_boid.dy -= 1 /boidFleeFactor}
-    if(_boid.y > targetpoint.y) {_boid.dy += 1 /boidFleeFactor}
+    let boidVector = createVector(_boid.x, _boid.y);
+    let newBoidVetor = createVector(targetpoint.x, targetpoint.y);
+    boidVector.sub(newBoidVetor);
+    let newBoidAngle = boidVector.heading();
+    let newdirection = createVector(cos(newBoidAngle),sin(newBoidAngle));
+    newdirection.normalize();
+    newdirection.mult(1/boidFleeFactor);
+    _boid.dx += newdirection.x;
+    _boid.dy += newdirection.y;
     if(showDebug) {
       stroke(0,255,0);
       strokeWeight(2);
