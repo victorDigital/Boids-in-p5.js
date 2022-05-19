@@ -1,10 +1,10 @@
 let boids = []; // contains array of boids objects
 let sharks = []; // contains array of shark objects
 
-let border = 30;
+let border = 20;
 let showDebug = false;
 
-let boidSeprationFactor = 5;
+let boidSeprationFactor = 4;
 let boidAlignmentFactor = 8;
 let boidCohesionFactor = 35;
 let sharkAttackFactor = 8;
@@ -29,8 +29,8 @@ function setup() {
   createCanvas(windowWidth,windowHeight);
   stroke(255);
   strokeWeight(10);
-  instantiateBoids(150 , boid)
-  instantiateSharks(2, shark)
+  instantiateBoids(50 , boid)
+  instantiateSharks(8, shark)
 }
 
 function draw() {
@@ -241,9 +241,16 @@ function boidBorder(_boid) {
 }
 
 function boidDraw(_boid) {
-  point(_boid.x,_boid.y);
+  let boidPos = createVector(_boid.x, _boid.y);
+  let newBoidPos = createVector(_boid.x+_boid.dx, _boid.y+_boid.dy);
+  boidPos.sub(newBoidPos);
+  let boidAngle = boidPos.heading() - HALF_PI;
+  translate(_boid.x,_boid.y);
+  rotate(boidAngle);
   strokeWeight(2);
-  line(_boid.x,_boid.y,_boid.x+_boid.dx*4,_boid.y+_boid.dy*4)
+  quad(0, -4.5, 0, -4.5, 4, 4.5, -4, 4.5);
+  rotate(-boidAngle);
+  translate(-_boid.x,-_boid.y);
   strokeWeight(10);
 }
 
@@ -312,9 +319,9 @@ function sharkBorder(_shark) {
 
 function sharkMaxSpeed(_shark) {
   let speedVector = createVector(_shark.dx, _shark.dy);
-  if(speedVector.mag() > 3) {
+  if(speedVector.mag() > 2) {
     speedVector.normalize();
-    speedVector.mult(3);
+    speedVector.mult(2);
     _shark.dx = speedVector.x;
     _shark.dy = speedVector.y;
   }
@@ -357,7 +364,7 @@ function sharkAttack(_shark, _boids) {
     if(showDebug) {
       stroke(255,0,0,100);
       strokeWeight(2);
-      line(_shark.x,_shark.y,targetpoint.x + (targetpointSpeed.x*10),targetpoint.y + (targetpointSpeed.y*10));
+      line(_shark.x,_shark.y,targetpoint.x + (targetpointSpeed.x*40),targetpoint.y + (targetpointSpeed.y*40));
       line(_shark.x,_shark.y,targetpoint.x,targetpoint.y);
       strokeWeight(10);
       stroke(255);
