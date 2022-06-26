@@ -416,7 +416,7 @@ function sharkSepration(_shark) {
 }
 
 function limitAmountOfBoids(_boids) {
-  if(_boids.length > 150) {
+  if(_boids.length > 200) {
     _boids.splice(0,1);
     print("boid removed");
   }
